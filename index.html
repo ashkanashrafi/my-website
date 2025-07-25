@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fa " dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامه ریزی روزانه</title>
+</head>
+<style>
+    body {
+        background-color: rgb(56, 55, 55);
+    }
+
+    input {
+        background-color: rgb(255, 255, 255);
+        width: 350px;
+        height: 50px;
+        border: solid;
+        border-radius: 40px;
+        padding: 5px;
+
+
+    }
+
+    ::placeholder {
+        color: rgb(77, 74, 74);
+        font-size: 14px;
+        font-family: Tahoma, sans-serif;
+        opacity: 0.8;
+        padding-right: 10px;
+        font-size: 18px;
+    }
+
+    .input-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .div_button {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+    }
+
+    div {
+        text-align: center;
+
+
+
+
+    }
+
+    .button_add {
+        background-color: azure;
+        width: 70px;
+        height: 40px;
+        border: solid;
+        border-radius: 40px;
+        font-size: large;
+
+    }
+
+    li {
+        background-color: rgb(255, 255, 255);
+        width: 250px;
+        height: 40px;
+        border: solid;
+        border-radius: 15px;
+        padding-top: 8px;
+
+
+    }
+
+    .delete {
+        background-color: rgb(201, 9, 9);
+        width: 25px;
+        height: 25px;
+        border: solid;
+        border-radius: 40px;
+        float: left
+    }
+
+    .done {
+        text-decoration: line-through;
+        background-color: rgb(201, 255, 201);
+    }
+
+    .timer-button {
+        background-color: rgb(0, 191, 255);
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-right: 10px;
+    }
+
+    .timer-button:hover {
+        background-color: rgb(0, 145, 200);
+    }
+
+    .divs {
+        background-color: rgb(0, 191, 255);
+        color: white;
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+        margin-top: 5px;
+        width: 300px;
+
+    }
+</style>
+
+<body>
+
+    <h1 style="text-align: center; color: #ffffff;">خوش آمدید من سعی می‌کنم کار شما را با برنامه جلو ببرم</h1>
+
+    <div class="input-wrapper">
+        <input type="text" id="text-input" placeholder="لطفا کار خود را وارد کنید" autocomplete="off">
+        <button onclick="add()" class="button_add">ذخیره</button>
+    </div>
+
+    <div class="div_button">
+        <div id="div"></div>
+        <ul id="list"></ul>
+    </div>
+
+    <audio id="alert-sound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3"></audio>
+
+
+    <script>
+
+
+
+        const work = ["ورزش", "ریاضی", "امنیت", "زبان انگلیسی", "درس دانشگاه", "مطالعه آزاد", "مدتیشن", "استراحت", "تغذیه"];
+        const text_input = document.querySelector("#text-input");
+        const div = document.getElementById('div');
+        const list = document.querySelector("#list");
+        const button_add = document.querySelector(".button_add");
+        const alertSound = document.getElementById("alert-sound");
+        list.innerHTML = localStorage.getItem("tasks") || "";
+        window.onload = function () {
+            const saved = localStorage.getItem("tasks");
+            if (saved) {
+                list.innerHTML = saved;
+                addDeleteListeners();
+            }
+        }
+        text_input.addEventListener('input', function () {
+            const value = text_input.value.toLowerCase();
+            div.innerHTML = '';
+
+            if (value === '') return;
+
+            const matches = work.filter(name => name.toLowerCase().startsWith(value));
+
+            matches.forEach(match => {
+                const content = document.createElement('div');
+                content.textContent = match;
+                content.classList.add('divs');
+
+
+
+                content.addEventListener('click', function () {
+                    text_input.value = match;
+                    div.innerHTML = '';
+                });
+
+                div.appendChild(content);
+            });
+        });
+
+
+
+        function save() {
+            localStorage.setItem("tasks", list.innerHTML);
+        }
+        function add() {
+            const text = text_input.value.trim();
+            if (text === "") {
+                return alert("لطفا به صورت واضح کار خود را وارد کنید");
+            }
+            const li = document.createElement("li");
+            const taskText = document.createElement("span");
+            taskText.textContent = text;
+            li.appendChild(taskText);
+
+            li.addEventListener("click", function () {
+                li.classList.toggle("done");
+                save();
+            });
+
+
+            const del = document.createElement("button");
+            del.className = "delete"
+            del.textContent = "x"
+
+
+            del.addEventListener
+                ("click", function (e) {
+                    e.stopPropagation();
+
+                    li.remove();
+                    save();
+                });
+            const timerButton = document.createElement("button");
+            timerButton.textContent = "تایمر";
+            timerButton.className = "timer-button";
+
+            timerButton.onclick = () => {
+                let seconds = prompt("چند ثانیه؟", 10);
+                if (isNaN(seconds) || seconds <= 0) return;
+                const original = timerButton.textContent;
+                const interval = setInterval(() => {
+                    seconds--;
+                    timerButton.textContent = `${seconds} ثانیه`;
+                    if (seconds <= 0) {
+                        clearInterval(interval);
+                        timerButton.textContent = original;
+                        alertSound.play();
+                    }
+                    alertSound.play().catch(e => {
+                        console.log("صدا اجرا نشد:", e);
+                    });
+                }, 1000);
+            };
+            li.addEventListener("dblclick", function () {
+                const newText = prompt("ویرایش کار:", li.firstChild.textContent.trim());
+                if (newText) {
+                    li.firstChild.textContent = newText + " ";
+                    save();
+                }
+            });
+
+            li.appendChild(timerButton);
+
+            li.appendChild(del);
+            list.appendChild(li);
+            text_input.value = ""
+            save();
+
+
+
+
+
+
+
+
+        }
+        function addDeleteListeners() {
+            const deleteButtons = document.querySelectorAll(".delete");
+            deleteButtons.forEach(button => {
+                button.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    button.parentElement.remove();
+                    save();
+                });
+            });
+        }
+
+
+
+        text_input.addEventListener("keydown", function (event) {
+            if (event.key === "Enter") {
+                add();
+            }
+        });
+
+
+
+    </script>
+</body>
